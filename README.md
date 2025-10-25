@@ -62,6 +62,11 @@ sudo make install
 brew install ta-lib
 ```
 
+**On Windows:**
+
+1.  Download the TA-Lib binary installer (`ta-lib-0.6.4-windows-x86_64.msi`) from the [official website](https://ta-lib.org/install/).
+2.  Run the installer and follow the on-screen instructions.
+
 ### 2. Install Python Dependencies
 
 ```bash
