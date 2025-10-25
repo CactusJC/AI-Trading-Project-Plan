@@ -1,0 +1,5 @@
+setup.py
+trading_ai_project.egg-info/PKG-INFO
+trading_ai_project.egg-info/SOURCES.txt
+trading_ai_project.egg-info/dependency_links.txt
+trading_ai_project.egg-info/top_level.txt
