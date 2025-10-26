@@ -47,6 +47,15 @@ TA-Lib is a C library, so it needs to be installed before the Python wrapper.
 
 **On Linux (Ubuntu/Debian):**
 
+You can use the automated installation script to install all dependencies, including the TA-Lib C library.
+
+```bash
+chmod +x install.sh
+./install.sh
+```
+
+Alternatively, you can install the dependencies manually:
+
 ```bash
 wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
 tar -xzf ta-lib-0.4.0-src.tar.gz
