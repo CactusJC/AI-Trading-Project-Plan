@@ -13,25 +13,25 @@ This project is a local AI application that predicts winning trades on historica
 ## Project Structure
 
 ```
-trading_ai_project/
-├── data/
-│   └── raw_csv/
-├── database/
-│   └── sql_scripts/
-├── env/
-│   └── gym_env.py
-├── models/
-│   └── rl_agent.py
-├── api/
-│   └── lnmarkets_client.py
-├── pine_scripts/
-│   └── parser.py
-├── notebooks/
-│   └── analysis.ipynb
-├── utils/
-│   └── indicators.py
-├── main.py
-└── README.md
+.
+├── trading_ai_project/
+│   ├── api/
+│   ├── data/
+│   ├── database/
+│   ├── env/
+│   ├── models/
+│   ├── notebooks/
+│   ├── pine_scripts/
+│   └── utils/
+├── backtest.py
+├── evaluate_agent.py
+├── inspect_client.py
+├── install.sh
+├── requirements.txt
+├── setup.py
+├── train_agent.py
+├── verify_install.py
+└── visualize_performance.py
 ```
 
 ## Installation
@@ -52,17 +52,6 @@ You can use the automated installation script to install all dependencies, inclu
 ```bash
 chmod +x install.sh
 ./install.sh
-```
-
-Alternatively, you can install the dependencies manually:
-
-```bash
-wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
-tar -xzf ta-lib-0.4.0-src.tar.gz
-cd ta-lib/
-./configure --prefix=/usr
-make
-sudo make install
 ```
 
 **On macOS:**
@@ -130,9 +119,17 @@ python3 visualize_performance.py
 
 This will save a `performance.png` file in the `trading_ai_project` directory.
 
-### 5. Live Trading
+### 5. Backtest with Random Actions
 
-Run the live trading simulation with the LN Markets API.
+Run a simple backtest with random actions to see how the environment behaves.
+
+```bash
+python3 backtest.py
+```
+
+### 6. Inspect the LN Markets API Connection
+
+Test the connection to the LN Markets API and inspect the client.
 
 **Note:** You will need to configure your API keys in `trading_ai_project/api/lnmarkets_client.py`.
 
@@ -142,15 +139,15 @@ Run the live trading simulation with the LN Markets API.
 options = {
     'key': 'YOUR_API_KEY',
     'secret': 'YOUR_API_SECRET',
-    'passphrase': 'YOUR_API_PASSPHRASE',
+    'passphrase': 'YOUR_API_PASSPHRHASE',
     'network': 'testnet'  # Use 'mainnet' for real trading
 }
 ```
 
-Then, run the live trading script:
+Then, run the inspection script:
 
 ```bash
-python3 live_trading.py
+python3 inspect_client.py
 ```
 
 ## Analysis
