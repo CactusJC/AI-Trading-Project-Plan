@@ -1,11 +1,15 @@
-from lnmarkets import rest
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
 
-options = {
-    'key': 'Zai8xehXFyl0JbIEBTGmP9cZ4knExRdbfb8Ki24ukR4=',
-    'secret': 'N4tvsDZtpevqeWuQ1dJ2MpK6SGlJh0Ocm43kB3yHbF9agQkP0JURO8zA0U9DiUyGzQFAFYMGSOcYtEPli8mTJA==',
-    'passphrase': '557569edb3fai',
-    'network': 'testnet'
-}
+from trading_ai_project.api.lnmarkets_client import get_lnmarkets_client
 
-client = rest.LNMarketsRest(**options)
-print(dir(client))
+if __name__ == '__main__':
+    client = get_lnmarkets_client()
+    try:
+        user = client.get_user()
+        print("Successfully connected to LN Markets API.")
+        print("Raw user response:")
+        print(user)
+    except Exception as e:
+        print(f"An error occurred: {e}")
