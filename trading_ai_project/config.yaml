@@ -1,0 +1,20 @@
+# trading_ai_project/config.yaml
+
+gym_env:
+  initial_balance: 10000
+  lookback_window: 20
+  fee_per_side: 0.00015
+  slippage_factor: 0.0001
+  max_drawdown: 0.2
+  max_exposure: 0.5
+  position_sizing:
+    method: 'volatility_scaled' # 'fixed' or 'volatility_scaled'
+    fixed_size: 0.1 # Used if method is 'fixed'
+    volatility_window: 20 # Used for volatility scaling
+    risk_factor: 0.05 # Used for volatility scaling
+
+logging:
+  level: 'INFO' # DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+database:
+  path: 'trading_ai_project/database/trading_data.db'
