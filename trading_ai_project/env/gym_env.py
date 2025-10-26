@@ -6,6 +6,7 @@ import sqlite3
 import talib
 import yaml
 import logging
+from trading_ai_project.utils.indicators import calculate_mvrv, calculate_sth_mvrv, calculate_stock_to_flow
 
 class TradingEnv(gym.Env):
     """Custom Environment for Bitcoin Trading"""
@@ -25,6 +26,7 @@ class TradingEnv(gym.Env):
         self.df = pd.read_sql_query("SELECT * FROM btc_daily_data", conn)
         conn.close()
         self.df = self.df.sort_values('timestamp').reset_index(drop=True)
+        self.df['timestamp'] = pd.to_datetime(self.df['timestamp'])
         self._add_technical_indicators()
 
         self.initial_balance = config['gym_env']['initial_balance']
@@ -43,9 +45,9 @@ class TradingEnv(gym.Env):
         self.action_space = spaces.Discrete(3)
 
         # Define observation space
-        # Columns: market_price, balance, shares_held, RSI, MACD, UpperBB, MiddleBB, LowerBB
+        # Columns: market_price, balance, shares_held, RSI, MACD, UpperBB, MiddleBB, LowerBB, MVRV, STH-MVRV, Stock-to-Flow
         self.observation_space = spaces.Box(
-            low=-np.inf, high=np.inf, shape=(8,), dtype=np.float32
+            low=-np.inf, high=np.inf, shape=(11,), dtype=np.float32
         )
 
         self.reset()
@@ -56,6 +58,9 @@ class TradingEnv(gym.Env):
         self.df['MACD'] = macd
         upper, middle, lower = talib.BBANDS(self.df['market_price'])
         self.df['UpperBB'], self.df['MiddleBB'], self.df['LowerBB'] = upper, middle, lower
+        self.df['mvrv'] = calculate_mvrv(self.df)
+        self.df['sth_mvrv'] = calculate_sth_mvrv(self.df)
+        self.df['stock_to_flow'] = calculate_stock_to_flow(self.df)
         self.df.dropna(inplace=True)
         self.df = self.df.reset_index(drop=True)
 
@@ -83,7 +88,10 @@ class TradingEnv(gym.Env):
             self.df.loc[self.current_step, 'MACD'],
             self.df.loc[self.current_step, 'UpperBB'],
             self.df.loc[self.current_step, 'MiddleBB'],
-            self.df.loc[self.current_step, 'LowerBB']
+            self.df.loc[self.current_step, 'LowerBB'],
+            self.df.loc[self.current_step, 'mvrv'],
+            self.df.loc[self.current_step, 'sth_mvrv'],
+            self.df.loc[self.current_step, 'stock_to_flow']
         ])
         return obs
 
