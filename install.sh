@@ -2,8 +2,15 @@
 # Installation script for the trading_ai_project
 
 set -e # Exit immediately if a command exits with a non-zero status.
+set -x # Print each command before it's executed.
 
 echo "Starting installation..."
+
+# Update package lists and install sqlite3
+echo "Installing sqlite3..."
+sudo apt-get update
+sudo apt-get install -y sqlite3 libsqlite3-dev
+echo "sqlite3 installed successfully."
 
 # Install TA-Lib C library
 echo "Installing TA-Lib C library..."

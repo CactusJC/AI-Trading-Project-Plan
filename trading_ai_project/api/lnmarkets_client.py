@@ -5,12 +5,12 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 
 from lnmarkets import rest
 
-# Replace with your actual API keys
+# API credentials sourced from environment variables for security
 options = {
-    'key': 'Zai8xehXFyl0JbIEBTGmP9cZ4knExRdbfb8Ki24ukR4=',
-    'secret': 'N4tvsDZtpevqeWuQ1dJ2MpK6SGlJh0Ocm43kB3yHbF9agQkP0JURO8zA0U9DiUyGzQFAFYMGSOcYtEPli8mTJA==',
-    'passphrase': '557569edb3fai',
-    'network': 'testnet'  # Use 'mainnet' for real trading
+    'key': os.getenv('LNMARKETS_API_KEY'),
+    'secret': os.getenv('LNMARKETS_API_SECRET'),
+    'passphrase': os.getenv('LNMARKETS_API_PASSPHRASE'),
+    'network': os.getenv('LNMARKETS_NETWORK', 'testnet')  # Default to testnet
 }
 
 def get_lnmarkets_client():
