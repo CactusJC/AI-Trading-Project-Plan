@@ -131,17 +131,13 @@ python3 backtest.py
 
 Test the connection to the LN Markets API and inspect the client.
 
-**Note:** You will need to configure your API keys in `trading_ai_project/api/lnmarkets_client.py`.
+**Note:** You will need to configure your API keys as environment variables.
 
-```python
-# trading_ai_project/api/lnmarkets_client.py
-
-options = {
-    'key': 'YOUR_API_KEY',
-    'secret': 'YOUR_API_SECRET',
-    'passphrase': 'YOUR_API_PASSPHRHASE',
-    'network': 'testnet'  # Use 'mainnet' for real trading
-}
+```bash
+export LNMARKETS_API_KEY='YOUR_API_KEY'
+export LNMARKETS_API_SECRET='YOUR_API_SECRET'
+export LNMARKETS_API_PASSPHRASE='YOUR_API_PASSPHRASE'
+export LNMARKETS_NETWORK='testnet'  # Use 'mainnet' for real trading
 ```
 
 Then, run the inspection script:
