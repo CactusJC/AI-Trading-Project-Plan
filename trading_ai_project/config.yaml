@@ -18,3 +18,4 @@ logging:
 
 database:
   path: 'trading_ai_project/database/trading_data.db'
+  table: 'btc_daily_data'

@@ -83,13 +83,17 @@ pip install -e .
 
 ### 1. Download and Import Data
 
-The project includes a script to download historical Bitcoin data and import it into a SQLite database.
+You can download fresh 1-minute Binance candles and map them to the expected schema.
 
 ```bash
-# This step was already completed and the data is in the repository.
-# To re-run the import, you can use the following script:
-python3 trading_ai_project/utils/import_to_sqlite.py
+# Fetch the last 30 days of BTC/USDT minute data (appends to existing CSV by default)
+python3 fetch_binance_1m.py --days 30
+
+# Map the raw CSV to the schema used by the rest of the project and load it into SQLite
+python3 map_minute_to_expected_schema.py
 ```
+
+> Tip: Use `--since 2024-01-01T00:00:00` or `--no-append` to control the exact date range you fetch.
 
 ### 2. Train the Agent
 
@@ -100,6 +104,15 @@ python3 train_agent.py
 ```
 
 This will save the trained model to `trading_ai_project/models/ppo_trading_agent.zip`.
+
+To train directly on the 1-minute data you fetched and mapped, point the trainer to the minute database and table:
+
+```bash
+python3 train_agent.py \
+  --db-path trading_ai_project/database/trading_data_minute_mapped.db \
+  --table btc_minute_mapped \
+  --timesteps 500000
+```
 
 ### 3. Evaluate the Agent
 

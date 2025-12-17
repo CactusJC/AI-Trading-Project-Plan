@@ -13,12 +13,15 @@ Features:
 - Saves trained model to disk.
 """
 
+import argparse
 import os
-import yaml
 import sqlite3
+
 import pandas as pd
+import yaml
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv
+
 from trading_ai_project.env.gym_env import TradingEnv
 
 
@@ -71,31 +74,46 @@ def train_agent(env, model_path, total_timesteps=200_000, tensorboard_log=None):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Train the PPO trading agent.")
+    parser.add_argument('--config', default=os.path.join('trading_ai_project', 'config.yaml'),
+                        help='Path to YAML config file')
+    parser.add_argument('--db-path', default=os.path.join('trading_ai_project', 'database', 'trading_data.db'),
+                        help='SQLite database with price history')
+    parser.add_argument('--table', default='btc_daily_data',
+                        help='Table name inside the SQLite database')
+    parser.add_argument('--timesteps', type=int, default=200_000,
+                        help='Number of PPO training steps')
+    parser.add_argument('--model-path', default=os.path.join('trading_ai_project', 'models', 'ppo_trading_agent'),
+                        help='Output path (without .zip) for the trained model')
+    parser.add_argument('--tensorboard-log', default=os.path.join('trading_ai_project', 'models', 'tensorboard'),
+                        help='Directory to store TensorBoard logs')
+
+    args = parser.parse_args()
+
     # Ensure directories exist
-    os.makedirs('trading_ai_project/models', exist_ok=True)
+    os.makedirs(os.path.dirname(args.model_path), exist_ok=True)
 
     # Load configuration
-    config_path = os.path.join('trading_ai_project', 'config.yaml')
-    if not os.path.exists(config_path):
-        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+    if not os.path.exists(args.config):
+        raise FileNotFoundError(f"Configuration file not found: {args.config}")
 
-    with open(config_path, 'r') as f:
+    with open(args.config, 'r') as f:
         config = yaml.safe_load(f)
 
+    # Override data source from CLI to keep environment data aligned
+    config.setdefault('database', {})
+    config['database']['path'] = args.db_path
+    config['database']['table'] = args.table
+
     # Verify training data
-    db_path = os.path.join('trading_ai_project', 'database', 'trading_data.db')
-    if not verify_training_data(db_path):
+    if not verify_training_data(args.db_path, table_name=args.table):
         raise SystemExit("Training aborted: insufficient or missing data.")
 
     # Initialize environment
     env = DummyVecEnv([lambda: TradingEnv(config)])
 
-    # Define paths
-    model_path = os.path.join('trading_ai_project', 'models', 'ppo_trading_agent')
-    tensorboard_log_dir = os.path.join('trading_ai_project', 'models', 'tensorboard')
-
     # Train the agent
-    train_agent(env, model_path, total_timesteps=200_000, tensorboard_log=tensorboard_log_dir)
+    train_agent(env, args.model_path, total_timesteps=args.timesteps, tensorboard_log=args.tensorboard_log)
 
     print("[DONE] Training finished successfully.")
-    print(f"TensorBoard logs: {tensorboard_log_dir}")
+    print(f"TensorBoard logs: {args.tensorboard_log}")

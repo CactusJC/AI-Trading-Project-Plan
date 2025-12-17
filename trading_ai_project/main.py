@@ -1,6 +1,13 @@
+import yaml
 from trading_ai_project.env.gym_env import TradingEnv
 import matplotlib.pyplot as plt
 import numpy as np
+
+
+def load_config(config_path: str = "trading_ai_project/config.yaml") -> dict:
+    """Load the project configuration from a YAML file."""
+    with open(config_path, "r") as f:
+        return yaml.safe_load(f)
 
 def run_backtest(env, episodes=1):
     """
@@ -39,7 +46,8 @@ def plot_results(rewards, net_worths):
     plt.show()
 
 if __name__ == '__main__':
-    env = TradingEnv('trading_ai_project/database/trading_data.db')
+    config = load_config()
+    env = TradingEnv(config)
     rewards, net_worths = run_backtest(env, episodes=1)
     # The plot_results function will not work in this environment,
     # but we can at least check if the backtest runs without errors.
