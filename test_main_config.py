@@ -12,6 +12,10 @@ class TestMainConfig(unittest.TestCase):
             config['database']['path'],
             'trading_ai_project/database/trading_data.db'
         )
+        self.assertEqual(
+            config['database']['table'],
+            'btc_daily_data'
+        )
 
 
 if __name__ == '__main__':
