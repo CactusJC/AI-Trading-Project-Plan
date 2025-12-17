@@ -22,8 +22,9 @@ class TradingEnv(gym.Env):
 
         # Load data and calculate indicators
         db_filepath = config['database']['path']
+        table_name = config['database'].get('table', 'btc_daily_data')
         conn = sqlite3.connect(db_filepath)
-        self.df = pd.read_sql_query("SELECT * FROM btc_daily_data", conn)
+        self.df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
         conn.close()
         self.df = self.df.sort_values('timestamp').reset_index(drop=True)
         self.df['timestamp'] = pd.to_datetime(self.df['timestamp'])
