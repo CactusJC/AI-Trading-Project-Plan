@@ -159,6 +159,14 @@ Then, run the inspection script:
 python3 inspect_client.py
 ```
 
+## Testing
+
+Run the full automated test suite with pytest to verify the environment, CLI overrides, and data utilities are working as expected:
+
+```bash
+python -m pytest -q
+```
+
 ## Analysis
 
 The `trading_ai_project/notebooks/analysis.ipynb` notebook provides a more in-depth analysis of the agent's performance.
