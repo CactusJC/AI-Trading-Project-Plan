@@ -159,7 +159,7 @@ class TradingEnv(gym.Env):
             fee_amount = transaction_value * self.fee
             cost = transaction_value + fee_amount
 
-            if self.balance > cost and shares_to_buy > 0:
+            if self.balance >= cost and shares_to_buy > 0:
                 self.shares_held += shares_to_buy
                 self.balance -= cost
                 trade_info = {
@@ -174,12 +174,12 @@ class TradingEnv(gym.Env):
                 self.logger.debug(f"Executed Buy: {trade_info}")
 
         elif action == 2:  # Sell
-            shares_to_sell = self.shares_held # Simple strategy: sell all held shares
-
-            slippage = self.slippage_factor * (shares_to_sell ** 2)
-            sell_price = current_price * (1 - slippage)
+            shares_to_sell = min(self.shares_held, self._calculate_position_size(current_price))
 
             if shares_to_sell > 0:
+                slippage = self.slippage_factor * (shares_to_sell ** 2)
+                sell_price = current_price * (1 - slippage)
+
                 transaction_value = shares_to_sell * sell_price
                 fee_amount = transaction_value * self.fee
                 revenue = transaction_value - fee_amount
