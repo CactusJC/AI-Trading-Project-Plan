@@ -40,36 +40,54 @@ def calculate_and_print_kpis(net_worths, trade_history):
     returns = np.diff(net_worths) / net_worths[:-1]
     sharpe_ratio = np.mean(returns) / np.std(returns) * np.sqrt(252) if np.std(returns) > 0 else 0
 
-    buy_trades = [t for t in trade_history if t['action'] == 'buy']
-    sell_trades = [t for t in trade_history if t['action'] == 'sell']
+    # Match buy/sell trades using FIFO
+    open_positions = [] # List of {'price': float, 'shares': float, 'fee': float}
+    completed_trades = [] # List of {'profit': float, 'buy_price': float, 'sell_price': float, 'shares': float}
 
-    # Simple pairing of buy and sell trades for win rate calculation
-    # This assumes a LIFO (last-in, first-out) trading strategy for simplicity
-    round_trips = []
-    while buy_trades and sell_trades:
-        buy = buy_trades.pop(0)
+    for trade in trade_history:
+        if trade['action'] == 'buy':
+            # Add new position to queue
+            # Fee per share for this batch
+            fee_per_share = trade['fee'] / trade['shares'] if trade['shares'] > 0 else 0
+            open_positions.append({
+                'price': trade['price'],
+                'shares': trade['shares'],
+                'fee_per_share': fee_per_share
+            })
 
-        # Find the corresponding sell trade (can be more complex in real scenarios)
-        corresponding_sell = None
-        for sell in sell_trades:
-            if sell['step'] > buy['step']:
-                corresponding_sell = sell
-                break
+        elif trade['action'] == 'sell':
+            shares_to_sell = trade['shares']
+            sell_fee_per_share = trade['fee'] / trade['shares'] if trade['shares'] > 0 else 0
 
-        if corresponding_sell:
-            profit = (corresponding_sell['price'] * corresponding_sell['shares']) - \
-                     (buy['price'] * buy['shares']) - \
-                     (buy['fee'] + corresponding_sell['fee'])
-            round_trips.append(profit)
-            sell_trades.remove(corresponding_sell)
+            while shares_to_sell > 0 and open_positions:
+                buy_pos = open_positions[0] # FIFO: take from oldest
 
-    total_round_trips = len(round_trips)
-    winning_trades = sum(1 for p in round_trips if p > 0)
+                matched_shares = min(shares_to_sell, buy_pos['shares'])
+
+                # Calculate profit for this matched portion
+                # Revenue - Cost - BuyFee - SellFee
+                revenue = matched_shares * trade['price']
+                cost = matched_shares * buy_pos['price']
+                buy_fee = matched_shares * buy_pos['fee_per_share']
+                sell_fee = matched_shares * sell_fee_per_share
+
+                profit = revenue - cost - buy_fee - sell_fee
+                completed_trades.append(profit)
+
+                # Update remaining shares
+                shares_to_sell -= matched_shares
+                buy_pos['shares'] -= matched_shares
+
+                if buy_pos['shares'] < 1e-9: # Effectively zero
+                    open_positions.pop(0)
+
+    total_round_trips = len(completed_trades)
+    winning_trades = sum(1 for p in completed_trades if p > 0)
     win_rate = winning_trades / total_round_trips if total_round_trips > 0 else 0
 
     print("\n--- Performance Metrics ---")
     print(f"Sharpe Ratio: {sharpe_ratio:.2f}")
-    print(f"Total Round-Trip Trades: {total_round_trips}")
+    print(f"Total Round-Trip Trades (FIFO matched): {total_round_trips}")
     print(f"Win Rate: {win_rate:.2%}")
     print(f"Final Net Worth: {net_worths[-1]:.2f}")
     print("-------------------------\n")

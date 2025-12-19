@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import yaml
 from stable_baselines3 import PPO
 from trading_ai_project.env.gym_env import TradingEnv
 import matplotlib.pyplot as plt
@@ -40,8 +41,11 @@ def plot_results(rewards, net_worths):
     plt.show()
 
 if __name__ == '__main__':
-    db_path = os.path.join('trading_ai_project', 'database', 'trading_data.db')
-    env = TradingEnv(db_path)
+    config_path = os.path.join('trading_ai_project', 'config.yaml')
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+
+    env = TradingEnv(config)
 
     model_path = "trading_ai_project/models/ppo_trading_agent.zip"
     model = PPO.load(model_path, env=env)
